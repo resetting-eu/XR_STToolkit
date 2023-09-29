@@ -1,0 +1,62 @@
+# GIMP - The GNU Image Manipulation Program
+# Copyright (C) 1995 Spencer Kimball and Peter Mattis
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# "Perlized" from C source by Manish Singh <yosh@gimp.org>
+
+# The invoke code is compiled on the app side.
+# The invoke code must assign to each result var
+
+sub font_get_by_name {
+    $blurb = "Returns the font with the given name.";
+    $help  = "Returns the font with the given name.";
+
+    &mitch_pdb_misc('2023', '3.0');
+
+    @inargs = (
+      { name => 'name', type => 'string', non_empty => 1,
+        desc => 'The name of the font' }
+    );
+
+    @outargs = (
+      { name => 'font', type => 'font', non_empty => 1,
+        desc => 'The font' }
+    );
+
+    %invoke = (
+        code => <<'CODE'
+{
+  font = GIMP_FONT (gimp_pdb_get_resource (gimp, GIMP_TYPE_FONT, name, GIMP_PDB_DATA_ACCESS_READ, error));
+
+  if (! font)
+    success = FALSE;
+}
+CODE
+    );
+}
+
+@headers = qw("core/gimp.h"
+              "gimppdb-utils.h");
+
+@procs = qw(font_get_by_name);
+
+%exports = (app => [@procs], lib => [@procs]);
+
+$desc = 'Font';
+$doc_title = 'gimpfont';
+$doc_short_desc = 'Installable object used by text tools.';
+$doc_long_desc = 'Installable object used by text tools.';
+
+1;
